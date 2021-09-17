@@ -1,16 +1,21 @@
 # Travis Chamness
 # DFS Puzzle Solution by Graph Mode
 # Sept 20th 2021
-#TODO - implement to allow user to add their own Goal
+#TODO - implement to allow user to add their own Goal.
 GOAL = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+ROW = 0
+COL = 1
+MIN_DIMENSION = 0
+MAX_DIMENSION = 2
 
 #Taken from Lab 3
 class Node:
-    def __init__(self, state, movement, parent):
+    def __init__(self, state, start, parent, movement):
         self.parent = parent
+        self.location = start
         self.neighbors = [] # Neighbors from this current state of the graph
         self.state = state # Puzzle at this current state
-        self.movement = movement # The movement up, left, down, or right
+        self.movement = movement
     #utility for comparing nodes
     def compare_state(self, state):
         same = True
@@ -29,7 +34,7 @@ class Node:
         return self.compare_state(GOAL)
 
     def copy(self):
-        newNode = Node(self.state, self.movement, self.parent)
+        newNode = Node(self.state, self.location, self.parent, self.movement)
         return newNode
     # Compares two nodes for whether or not they are the same
     #   Does not consider the movement, because a movement may not have happened yet, and certainly should not happen again.'
@@ -41,7 +46,7 @@ class Node:
             return True
         else:
             if o.state.shape() == self.state.shape():
-                return self.compare_state(o.state) and self.neighbors == o.neighbors and self.parent.compare_state(o.parent.state)
+                return self.location == o.location and self.compare_state(o.state) and self.neighbors == o.neighbors and self.parent.compare_state(o.parent.state)
             else:
                 return False
 
@@ -84,7 +89,62 @@ def print_puzzle_id_start(puzzle, find_start = False):
     else:
         return ''
 
+def dfs_successor_func(currentNode):
+    copyLocation = currentNode.location.copy()
+    copyState = [row[:] for row in currentNode.state]
+    #Order reversal of Operation that mimics the stack for U, L, D, R order
+    #Right
+    if copyLocation[COL] != MAX_DIMENSION:
+        temp = copyState[copyLocation[ROW]][copyLocation[COL]+1]
+        copyState[copyLocation[ROW]][copyLocation[COL]+1] = copyState[copyLocation[ROW]][copyLocation[COL]]
+        copyState[copyLocation[ROW]][copyLocation[COL]] = temp
+        copyLocation[COL] += 1
+        newNode = Node(copyState, copyLocation, currentNode, 'R')
+        currentNode.neighbors.append(newNode)
+    #Down
+    copyLocation = currentNode.location.copy()
+    copyState = [row[:] for row in currentNode.state]
+    if copyLocation[ROW] != MAX_DIMENSION:
+        temp = copyState[copyLocation[ROW] + 1][copyLocation[COL]]
+        copyState[copyLocation[ROW]+1][copyLocation[COL]] = copyState[copyLocation[ROW]][copyLocation[COL]]
+        copyState[copyLocation[ROW]][copyLocation[COL]] = temp
+        copyLocation[ROW] += 1
+        newNode = Node(copyState, copyLocation, currentNode, 'D')
+        currentNode.neighbors.append(newNode)
+    #Left
+    copyLocation = currentNode.location.copy()
+    copyState = [row[:] for row in currentNode.state]
+    if copyLocation[COL] != MIN_DIMENSION:
+        temp = copyState[copyLocation[ROW]][copyLocation[COL] - 1]
+        copyState[copyLocation[ROW]][copyLocation[COL] - 1] = copyState[copyLocation[ROW]][copyLocation[COL]]
+        copyState[copyLocation[ROW]][copyLocation[COL]] = temp
+        copyLocation[COL]= copyLocation[COL] - 1
+        newNode = Node(copyState, copyLocation, currentNode, 'L')
+        currentNode.neighbors.append(newNode)
+    #UP
+    copyLocation = currentNode.location.copy()
+    copyState = [row[:] for row in currentNode.state]
+    if copyLocation[ROW] != MIN_DIMENSION:
+        temp = copyState[copyLocation[ROW] - 1][copyLocation[COL]]
+        copyState[copyLocation[ROW]-1][copyLocation[COL]] = copyState[copyLocation[ROW]][copyLocation[COL]]
+        copyState[copyLocation[ROW]][copyLocation[COL]] = temp
+        copyLocation[ROW] = copyLocation[ROW] - 1
+        newNode = Node(copyState, copyLocation, currentNode, 'U')
+        currentNode.neighbors.append(newNode)
+    return currentNode
 
+def populate_path(node):
+    path = []
+    currentNode = node.copy()
+    while currentNode != None:
+        path.insert(0, currentNode.movement)
+        currentNode = currentNode.parent
+    return path
+
+def append_to_fringe(fringe, currentNode):
+    for node in currentNode.neighbors:
+        fringe.append(node.copy())
+    return fringe
 
 def dfs_solution(puzzle):
     find_start = True
@@ -92,7 +152,7 @@ def dfs_solution(puzzle):
     print("Start Location: ",start)
     path = []
     closed = []
-    head = Node(puzzle, None, None) #initialized head on Fringe
+    head = Node(puzzle, start, None, None) #initialized head on Fringe
     goalFound = False
     currentNode = None
     fringe = [head]
@@ -101,6 +161,13 @@ def dfs_solution(puzzle):
         goalFound = currentNode.goal_test()
         print(print_puzzle_id_start(currentNode.state))
         if not goalFound:
-            #successor function
+            closed.append(currentNode)
+            currentNode = dfs_successor_func(currentNode)
+            fringe = append_to_fringe(fringe, currentNode)
+        elif goalFound:
+            path = populate_path(currentNode)
             #append to fringe
+    print(path)
+
+
 dfs_solution(create_puzzle())
