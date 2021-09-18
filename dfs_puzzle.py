@@ -45,19 +45,24 @@ class Node:
         elif o is self:
             return True
         else:
-            if o.state.shape() == self.state.shape():
-                return self.location == o.location and self.compare_state(o.state) and self.neighbors == o.neighbors and self.parent.compare_state(o.parent.state)
-            else:
-                return False
+            return self.location == o.location and self.compare_state(o.state) and self.neighbors == o.neighbors and self.parent.compare_state(o.parent.state)
 
-
-
+def not_in_closed(currentNode, closed):
+    in_closed = False
+    for node in closed:
+        if in_closed:
+            break
+        else:
+            in_closed = currentNode.compare(node)
+    return in_closed
 #Reads puzzle from file or user
 def create_puzzle():
     #For user specified puzzle
     # maze_name = input("Enter puzzle name(Example - puzzle.txt): ")
     #For Hardcoded puzzle use
-    maze_name = "puzzle1.txt"
+    # maze_name = "puzzle1.txt"
+    # maze_name = "puzzle2.txt"
+    maze_name = "puzzle3.txt"
     file = open(maze_name, "r")
     lines = file.readlines()
     puzzle = []
@@ -148,19 +153,21 @@ def append_to_fringe(fringe, currentNode):
 
 def dfs_solution(puzzle):
     find_start = True
+    goalFound = False
     start = print_puzzle_id_start(puzzle, find_start)
     print("Start Location: ",start)
     path = []
     closed = []
     head = Node(puzzle, start, None, None) #initialized head on Fringe
-    goalFound = False
     currentNode = None
     fringe = [head]
     while not goalFound and fringe:
+        in_closed = False
         currentNode = fringe.pop()
         goalFound = currentNode.goal_test()
         print(print_puzzle_id_start(currentNode.state))
-        if not goalFound:
+        in_closed = not_in_closed(currentNode, closed)
+        if not goalFound and not in_closed:
             closed.append(currentNode)
             currentNode = dfs_successor_func(currentNode)
             fringe = append_to_fringe(fringe, currentNode)
@@ -168,6 +175,7 @@ def dfs_solution(puzzle):
             path = populate_path(currentNode)
             #append to fringe
     print(path)
+    return path
 
 
 dfs_solution(create_puzzle())
