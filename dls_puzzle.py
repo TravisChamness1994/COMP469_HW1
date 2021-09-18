@@ -1,22 +1,20 @@
 # Travis Chamness
 # DLS Puzzle Solution by Graph Mode
 # Sept 20th 2021
-#TODO - implement to allow user to add their own Goal.
 GOAL = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
 ROW = 0
 COL = 1
 MIN_DIMENSION = 0
 MAX_DIMENSION = 2
 
-#Taken from Lab 3
 class Node:
     def __init__(self, state, start, parent, movement, depth):
         self.parent = parent
         self.location = start
         self.neighbors = [] # Neighbors from this current state of the graph
         self.state = state # Puzzle at this current state
-        self.movement = movement
-        self.depth = depth
+        self.movement = movement # Movement in the puzzle resulting in the state
+        self.depth = depth # Current depth of the branch
     #utility for comparing nodes
     def compare_state(self, state):
         same = True
@@ -46,7 +44,7 @@ class Node:
         elif o is self:
             return True
         else:
-            return self.location == o.location and self.compare_state(o.state) and self.neighbors == o.neighbors and self.parent.compare_state(o.parent.state)
+            return self.location == o.location and self.compare_state(o.state)
 
 def not_in_closed(currentNode, closed):
     in_closed = False
