@@ -62,8 +62,8 @@ def create_puzzle():
     #For Hardcoded puzzle use
     # maze_name = "puzzle1.txt"
     # maze_name = "puzzle2.txt"
-    # maze_name = "puzzle3.txt"
-    maze_name = "puzzle4BFS.txt"
+    maze_name = "puzzle3.txt"
+    # maze_name = "puzzle4BFS.txt"
 
     file = open(maze_name, "r")
     lines = file.readlines()
@@ -117,7 +117,7 @@ def bfs_successor_func(currentNode):
         copyLocation[COL]= copyLocation[COL] - 1
         newNode = Node(copyState, copyLocation, currentNode, 'L')
         currentNode.neighbors.append(newNode)
-     #Down
+    #Down
     copyLocation = currentNode.location.copy()
     copyState = [row[:] for row in currentNode.state]
     if copyLocation[ROW] != MAX_DIMENSION:
