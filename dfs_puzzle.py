@@ -45,7 +45,7 @@ class Node:
         elif o is self:
             return True
         else:
-            return self.location == o.location and self.compare_state(o.state)
+            return self.compare_state(o.state)
 
 def not_in_closed(currentNode, closed):
     in_closed = False
