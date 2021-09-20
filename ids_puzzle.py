@@ -182,6 +182,6 @@ def dls_solution_wrapper(depth):
             iterationDepth = i + 1
             path = dls_solution(create_puzzle(), iterationDepth)
         else: break
-    return path
+    return path, len(path) - 1
 
-dls_solution(create_puzzle(), 2)
+dls_solution(create_puzzle(), 3)

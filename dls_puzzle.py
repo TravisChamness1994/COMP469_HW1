@@ -173,7 +173,7 @@ def dls_solution(puzzle, limit):
             path = populate_path(currentNode)
             #append to fringe
     print(path)
-    return path
+    return path, len(path) - 1
 
 
-dls_solution(create_puzzle(), 2)
+print(dls_solution(create_puzzle(), 5))

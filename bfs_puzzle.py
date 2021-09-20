@@ -179,7 +179,7 @@ def bfs_solution(puzzle):
             path = populate_path(currentNode)
         print(iteration)
     print(path)
-    return path
+    return path, len(path) - 1
 
 bfs_solution(create_puzzle())
 

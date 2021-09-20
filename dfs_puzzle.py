@@ -44,8 +44,8 @@ class Node:
             return False
         elif o is self:
             return True
-        else:
-            return self.compare_state(o.state)
+        else: #The location comparison is helpful for short circuiting
+            return self.location == o.location and self.compare_state(o.state)
 
 def not_in_closed(currentNode, closed):
     in_closed = False
@@ -55,6 +55,7 @@ def not_in_closed(currentNode, closed):
         else:
             in_closed = currentNode.compare(node)
     return in_closed
+
 #Reads puzzle from file or user
 def create_puzzle():
     #For user specified puzzle
@@ -175,7 +176,7 @@ def dfs_solution(puzzle):
             path = populate_path(currentNode)
             #append to fringe
     print(path)
-    return path
+    return path, len(path) - 1
 
 
 dfs_solution(create_puzzle())
